@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Kviz</title>
+  <style>
+    /* ========================
+       BOJE I TIPOGRAFIJA
+    ======================== */
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --primary: #3b82f6;
+      --accent: #10b981;
+      --font: 'Arial', sans-serif;
+    }
+
+    /* RESET I OSNOVNI LAYOUT */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+    }
+
+    /* Ekrani kviza */
+    #intro, #quiz, #result {
+      padding: 1.5rem;
+    }
+
+    /* Klasa za skrivanje */
+    .hidden {
+      display: none;
+    }
+
+    /* Pitanje i dugmad */
+    #question {
+      margin-bottom: 1rem;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+      transition: background 0.3s;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    #feedback {
+      min-height: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #next-btn {
+      display: none;
+    }
+
+    #score {
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 1) INTRO EKRAN -->
+    <div id="intro">
+      <h2>Dobrodošli u kviz!</h2>
+      <label for="playerName">Vaše ime:</label><br>
+      <input type="text" id="playerName" placeholder="Unesite ime"><br><br>
+      <button id="start-btn">Počni kviz</button>
+    </div>
+
+    <!-- 2) EKRAN SA PITANJIMA -->
+    <div id="quiz" class="hidden">
+      <h2 id="question">Pitanje</h2>
+      <div id="answer-buttons" class="btn-grid"></div>
+      <div id="feedback"></div>
+      <div id="score"></div>
+      <button id="next-btn">Sledeće</button>
+    </div>
+
+    <!-- 3) EKRAN SA REZULTATOM -->
+    <div id="result" class="hidden">
+      <h2>Kraj kviza!</h2>
+      <p id="final-score"></p>
+    </div>
+  </div>
+
+  <script>
+    // Tvoj Web App URL (Apps Script deployment)
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxmMNiEwQx8H8HzYY8CD0sXFyMLCH2MRxMb6dtMcQe9O2ugDt7Db-4Gq9ya7OYk-Xjaow/exec';
+
+    // Lista od 3 pitanja
+    const questions = [
+      { q: 'Koliko je 2 + 3?',      options: [4,5,6,7], answer: 5 },
+      { q: 'Koliko je 10 - 7?',     options: [2,3,4,5], answer: 3 },
+      { q: 'Koliko je 4 * 2?',      options: [6,7,8,9], answer: 8 },
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // Reference na elemente
+    const introEl         = document.getElementById('intro');
+    const quizEl          = document.getElementById('quiz');
+    const resultEl        = document.getElementById('result');
+    const startBtn        = document.getElementById('start-btn');
+    const playerNameInput = document.getElementById('playerName');
+    const questionEl      = document.getElementById('question');
+    const answerButtonsEl = document.getElementById('answer-buttons');
+    const feedbackEl      = document.getElementById('feedback');
+    const scoreEl         = document.getElementById('score');
+    const nextBtn         = document.getElementById('next-btn');
+    const finalScoreEl    = document.getElementById('final-score');
+
+    // 1) START KVIZA
+    startBtn.addEventListener('click', () => {
+      const name = playerNameInput.value.trim();
+      if (!name) {
+        alert('Molimo unesite vaše ime.');
+        return;
+      }
+      introEl.classList.add('hidden');
+      quizEl.classList.remove('hidden');
+      currentQuestionIndex = 0;
+      score = 0;
+      showQuestion();
+    });
+
+    // 2) PRIKAZ PITANJA
+    function showQuestion() {
+      resetState();
+      const current = questions[currentQuestionIndex];
+      questionEl.textContent = current.q;
+      scoreEl.textContent = `Poeni: ${score}`;
+      current.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.addEventListener('click', () => selectAnswer(opt));
+        answerButtonsEl.appendChild(btn);
+      });
+    }
+
+    function resetState() {
+      feedbackEl.textContent = '';
+      nextBtn.style.display = 'none';
+      answerButtonsEl.innerHTML = '';
+    }
+
+    // 3) ODGOVOR KORISNIKA
+    function selectAnswer(selected) {
+      const current = questions[currentQuestionIndex];
+      Array.from(answerButtonsEl.children).forEach(b => b.disabled = true);
+
+      if (selected === current.answer) {
+        score++;
+        feedbackEl.textContent = '✅ Tačno!';
+      } else {
+        feedbackEl.textContent = `❌ Netačno! Tačan odgovor je ${current.answer}`;
+      }
+      scoreEl.textContent = `Poeni: ${score}`;
+      nextBtn.style.display = 'inline-block';
+    }
+
+    // 4) SLEDEĆE PITANJE ILI KRAJ KVIZA
+    nextBtn.addEventListener('click', () => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        endQuiz();
+      }
+    });
+
+    // 5) KRAJ KVIZA I SLANJE REZULTATA
+    function endQuiz() {
+
+   
+
+      quizEl.classList.add('hidden');
+      resultEl.classList.remove('hidden');
+      finalScoreEl.textContent = `Osvojeni poeni: ${score} / ${questions.length}`;
+
+      const data = {
+        playerName: playerNameInput.value.trim(),
+        score: score
+      };
+
+      // Slanje rezultata (koristimo no-cors zbog ograničenja CORS-a)
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
+        body: JSON.stringify(data)
+      })
+      .then(() => console.log('Rezultati poslati.'))
+      .catch(err => console.error('Greška pri slanju:', err));
+    }
+
+
+
+
+
+
+
+function finish() {
+  // Sakri kviz, prikaži ekran sa rezultatom
+  quizEl.classList.add('hidden');
+  resEl.classList.remove('hidden');
+  finalEl.textContent = `Osvojio si ${score} od ${questions.length}`;
+
+  // Pripremi objekat koji šalješ
+  const data = {
+    playerName: nameInp.value.trim(),
+    score: score
+  };
+
+  // 1) Loguj payload pre nego što ga pošalješ
+  console.log('>> Saljem payload:', data);
+  // Ovde ćeš u Console videti nešto kao:
+  //    >> Saljem payload: {playerName: "Mika", score: 2}
+
+  // 2) Pošalji zahtev na Web App
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',        // zbog CORS ograničenja
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    // 3) Loguj posle uspešnog pokretanja fetch-a
+    console.log('>> fetch() je pokrenut, zahtev je poslat.');
+  })
+  .catch(err => {
+    // 4) Ako dođe do greške u samom fetch pozivu
+    console.error('>> Greška pri slanju:', err);
+  });
+}
+
+
+
+
+
+
+  </script>
+
+</body>
+</html>
