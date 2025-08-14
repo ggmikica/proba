@@ -136,26 +136,26 @@
       resultEl.classList.remove('hidden');
       finalEl.textContent = `Osvojeni poeni: ${score} / ${questions.length}`;
 
-      const payload = { playerName: nameIn.value.trim(), score };
-      console.log('>> Saljem:', payload);
+   const payload = {
+    playerName: playerNameInput.value.trim(),
+    score: score
+  };
+  console.log('>> Saljem:', payload);
 
-      // bez headers, sa no-cors
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        console.log('>> Fetch ok');
-        statusEl.textContent = '✅ Rezultat poslat!';
-      })
-      .catch(e => {
-        console.error('>> Greška fetch:', e);
-        statusEl.textContent = '❌ Greška pri slanju';
-        statusEl.style.color = 'red';
-      });
-    }
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams(payload)
+  })
+  .then(() => console.log('>> Fetch ok'))
+  .catch(e => console.error('>> Greška fetch:', e));
+}
+
+
   </script>
 
 </body>
+
 </html>
