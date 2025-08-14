@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test doPost</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #10b981;
+    }
+    #response {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="test-btn">Testiraj doPost vezu</button>
+  <div id="response"></div>
+
+  <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxmMNiEwQx8H8HzYY8CD0sXFyMLCH2MRxMb6dtMcQe9O2ugDt7Db-4Gq9ya7OYk-Xjaow/exec';
+
+    document.getElementById('test-btn').onclick = () => {
+      const testPayload = {
+        playerName: 'TestUser',
+        score: 999
+      };
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(testPayload)
+      })
+      .then(res => res.text())
+      .then(txt => {
+        document.getElementById('response').textContent = `✅ Odgovor sa servera: ${txt}`;
+      })
+      .catch(err => {
+        document.getElementById('response').textContent = `❌ Greška: ${err}`;
+      });
+    };
+  </script>
+
+</body>
+</html>
