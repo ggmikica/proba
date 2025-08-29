@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kviz: Celi brojevi</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body> 
+    <div id="intro">
+    <h2>Dobrodošli u kviz!</h2>
+    <label for="ime">Unesi svoje ime:</label>
+    <input type="text" id="ime"><br><br>
+ 
+    <button onclick="pokreniKviz()">Započni kviz</button>
+    </div>
+        <div id="kviz">
+       <div id="kraj" style="display:none; font-size: 1.6em; margin-top: 20px;"></div>
+
+
+        <!-- Poruka koja se prikazuje nakon što korisnik klikne na dugme -->
+        <div id="porukaKraj" style="display:none; font-size: 1.5em; margin-top: 20px;">
+        Hvala što ste igrali! 🎉 Nadamo se da ste uživali.
+        </div>
+
+<!-- Diploma koja se pojavljuje na kraju -->
+<div id="diploma" style="display:none;
+                        border: 2px solid gold;
+                        background: #fff;
+                        color: #000;
+                        padding: 20px;
+                        border-radius: 12px;
+                        margin: 20px auto;
+                        max-width: 400px;
+                        text-align: center;
+                        animation: zoomIn 0.5s ease;">
+  <h2>Diploma</h2>
+  <p id="tekstDiplome"></p>
+  <div class="diploma-buttons">
+    <button id="prekiniBtn">Prekini</button>
+   <!-- <button id="ponovoBtn">Odigraj ponovo</button>-->
+  </div>
+</div>
+
+
+              <div id="quiz">
+              <h3 id="pozdrav"></h3>
+              <div class="quiz-container">
+              <h5> Kviz: </h5>
+              <h1> Celi brojevi</h1>
+              <p id="question">Pitanje se učitava...</p>
+              <div id="answer-buttons" class="btn-grid"></div>
+              <p id="feedback"></p>
+              <p id="score">Poeni: 0 | Pitanje: 0/TOTAL</p>
+              <button id="next-btn">Sledeće pitanje</button>
+              <div id="result-screen" class="hidden"></div>
+              </div>
+            <!-- Dugme koje se pojavljuje na kraju kviza -->
+           <button id="dugmeKraj" style="display:none;">KRAJ KVIZA</button>
+           </div>
+</div>
+<script src="script.js" defer></script>
+
+</body>
+</html>
