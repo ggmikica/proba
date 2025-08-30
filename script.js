@@ -326,7 +326,7 @@
     // ----------- ODABIR ODGOVORA -----------
     function selectAnswer(choice, btn) {
       Array.from(buttonsEl.children).forEach(b => b.disabled = true);
-
+if (count >= 1) {  document.getElementById("pozdrav").style.display = "none";}
       if (choice === correctAnswer) {
         points += 5;
 
@@ -461,6 +461,7 @@ function posalji() {
 
 
 }
+
 
 
 
